@@ -73,7 +73,7 @@ def create_new_student():
         if connection.is_connected():
             cursor.close()
             connection.close()
-            
+
 @app.route('/api/students/<int:student_id>', methods=['PUT'])
 def update_student(student_id):
     if not request.json:
@@ -104,7 +104,7 @@ def update_student(student_id):
         if connection.is_connected():
             cursor.close()
             connection.close()
-            
+
 @app.route('/api/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
     connection = createConnection()
@@ -124,7 +124,24 @@ def delete_student(student_id):
         if connection.is_connected():
             cursor.close()
             connection.close()
-            
 
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify(
+        {
+            "success": False,
+            "error": "Resource not found"
+        }
+    ), HTTPStatus.NOT_FOUND
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify(
+        {
+            "success": False,
+            "error": "Internal Server Error"
+        }
+    ), HTTPStatus.INTERNAL_SERVER_ERROR
+    
 if __name__ == '__main__':
     app.run(debug=True)
