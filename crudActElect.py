@@ -105,6 +105,26 @@ def update_student(student_id):
             cursor.close()
             connection.close()
             
+@app.route('/api/students/<int:student_id>', methods=['DELETE'])
+def delete_student(student_id):
+    connection = createConnection()
+    if not connection:
+        return jsonify({'success': False, 'error': 'Database connection failed'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM student_details WHERE id = %s", (student_id,))
+        connection.commit()
+        if cursor.rowcount == 0:
+            return jsonify({'success': False, 'error': 'Student not found'}), HTTPStatus.NOT_FOUND
+        return jsonify({'success': True, 'message': 'Student deleted successfully'}), HTTPStatus.OK
+    except Error as e:
+        return jsonify({'success': False, 'error': f"Database query failed: {e}"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+            
 
 if __name__ == '__main__':
     app.run(debug=True)
